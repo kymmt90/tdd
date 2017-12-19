@@ -1,5 +1,10 @@
+require_relative 'expression'
+require_relative 'sum'
+
 class Money
   attr_reader :amount, :currency
+
+  include Expression
 
   def self.dollar(amount)
     Money.new(amount, 'USD')
@@ -18,6 +23,10 @@ class Money
     "#{amount} #{currency}"
   end
 
+  def reduce(to)
+    self
+  end
+
   def times(multiplier)
     Money.new(amount * multiplier, currency)
   end
@@ -27,6 +36,6 @@ class Money
   end
 
   def +(money)
-    Money.new(amount + money.amount, currency)
+    Sum.new(self, money)
   end
 end
