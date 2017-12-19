@@ -23,8 +23,9 @@ class Money
     "#{amount} #{currency}"
   end
 
-  def reduce(to)
-    self
+  def reduce(bank, to)
+    rate = bank.rate(currency, to)
+    Money.new(amount / rate, to)
   end
 
   def times(multiplier)
