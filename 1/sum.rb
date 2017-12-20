@@ -14,4 +14,12 @@ class Sum
     amount = augend.reduce(bank, to).amount + addend.reduce(bank, to).amount
     Money.new(amount, to)
   end
+
+  def +(addend)
+    Sum.new(self, addend)
+  end
+
+  def *(multiplier)
+    Sum.new(augend * 2, addend * 2)
+  end
 end

@@ -3,7 +3,11 @@ module Expression
     raise NotImplementedError
   end
 
-  def +(money)
+  def +(addend)
+    raise NotImplementedError
+  end
+
+  def *(multiplier)
     raise NotImplementedError
   end
 end

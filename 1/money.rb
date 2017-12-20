@@ -32,8 +32,8 @@ class Money
     amount == money.amount && currency == money.currency
   end
 
-  def +(money)
-    Sum.new(self, money)
+  def +(addend)
+    Sum.new(self, addend)
   end
 
   def *(multiplier)
