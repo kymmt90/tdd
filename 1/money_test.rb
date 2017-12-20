@@ -5,8 +5,8 @@ require_relative 'money'
 class MoneyTest < MiniTest::Unit::TestCase
   def test_multiplication
     five = Money.dollar(5)
-    assert Money.dollar(10), five.times(2)
-    assert Money.dollar(15), five.times(3)
+    assert Money.dollar(10), five * 2
+    assert Money.dollar(15), five * 3
   end
 
   def test_equality
@@ -55,5 +55,14 @@ class MoneyTest < MiniTest::Unit::TestCase
 
   def test_identity_rate
     assert_equal 1, Bank.new.rate('USD', 'USD')
+  end
+
+  def test_mixed_addition
+    five_bucks = Money.dollar(5)
+    ten_francs = Money.franc(10)
+    bank = Bank.new
+    bank.add_rate('CHF', 'USD', 2)
+    result = bank.reduce(five_bucks + ten_francs, 'USD')
+    assert_equal Money.dollar(10), result
   end
 end

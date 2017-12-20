@@ -28,15 +28,15 @@ class Money
     Money.new(amount / rate, to)
   end
 
-  def times(multiplier)
-    Money.new(amount * multiplier, currency)
-  end
-
   def ==(money)
     amount == money.amount && currency == money.currency
   end
 
   def +(money)
     Sum.new(self, money)
+  end
+
+  def *(multiplier)
+    Money.new(amount * multiplier, currency)
   end
 end
