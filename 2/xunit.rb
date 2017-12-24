@@ -5,13 +5,11 @@ class TestCase
     @name = name
   end
 
-  def run
-    result = TestResult.new
+  def run(result)
     result.test_started
     set_up
     public_send(name) rescue result.test_failed
     tear_down
-    result
   end
 
   def set_up
@@ -40,6 +38,20 @@ class TestResult
   end
 end
 
+class TestSuite
+  def initialize
+    @tests = []
+  end
+
+  def add(test)
+    @tests << test
+  end
+
+  def run(result)
+    @tests.each { |test| test.run(result) }
+  end
+end
+
 class WasRun < TestCase
   attr_reader :log
 
@@ -61,37 +73,56 @@ class WasRun < TestCase
 end
 
 class TestCaseTest < TestCase
+  attr_reader :result
+
+  def set_up
+    @result = TestResult.new
+  end
+
   def test_template_method
     test = WasRun.new('test_method')
-    test.run
+    test.run(result)
     expect = 'set_up test_method tear_down'
     raise "expect #{expect}, actual #{test.log}" unless test.log == expect
   end
 
   def test_result
     test = WasRun.new('test_method')
-    result = test.run
+    test.run(result)
     expect = '1 run, 0 failed'
     raise "expect #{expect}, actual #{result.summary}" unless result.summary == expect
   end
 
   def test_failed_result
     test = WasRun.new('test_broken_method')
-    result = test.run
+    test.run(result)
     expect = '1 run, 1 failed'
     raise "expect #{expect}, actual #{result.summary}" unless result.summary == expect
   end
 
   def test_failed_result_formatting
-    result = TestResult.new
     result.test_started
     result.test_failed
     expect = '1 run, 1 failed'
     raise "expect #{expect}, actual #{result.summary}" unless result.summary == expect
   end
+
+  def test_suite
+    suite = TestSuite.new
+    suite.add(WasRun.new('test_method'))
+    suite.add(WasRun.new('test_broken_method'))
+    suite.run(result)
+    expect = '2 run, 1 failed'
+    raise "expect #{expect}, actual #{result.summary}" unless result.summary == expect
+  end
 end
 
-puts TestCaseTest.new('test_template_method').run.summary
-puts TestCaseTest.new('test_result').run.summary
-puts TestCaseTest.new('test_failed_result').run.summary
-puts TestCaseTest.new('test_failed_result_formatting').run.summary
+suite = TestSuite.new
+suite.add(TestCaseTest.new('test_template_method'))
+suite.add(TestCaseTest.new('test_result'))
+suite.add(TestCaseTest.new('test_failed_result'))
+suite.add(TestCaseTest.new('test_failed_result_formatting'))
+suite.add(TestCaseTest.new('test_suite'))
+result = TestResult.new
+suite.run(result)
+puts result.summary
